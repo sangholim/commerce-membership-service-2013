@@ -1,0 +1,103 @@
+########################################
+# Default Configuration
+########################################
+
+spring:
+  data:
+    mongodb:
+      database: membership-db
+      auto-index-creation: true
+  devtools:
+    livereload:
+      enabled: false
+  jackson:
+    deserialization:
+      read-date-timestamps-as-nanoseconds: false
+    serialization:
+      write-dates-as-timestamps: true
+      write-date-timestamps-as-nanoseconds: false
+    default-property-inclusion: non_null
+    mapper:
+      default-view-inclusion: true
+
+logging:
+  charset:
+    console: utf-8
+    file: utf-8
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+  forward-headers-strategy: native
+
+management:
+  endpoint.health.probes.enabled: true
+
+springdoc:
+  swagger-ui.enabled: false
+  api-docs.enabled: false
+  packages-to-scan: io.commerce.membershipService
+
+---
+
+########################################
+# Spring Cloud Stream Configuration
+########################################
+
+spring:
+  config:
+    activate:
+      on-profile: "!oas"
+  cloud:
+    function:
+      definition: customerRegisteredConsumer;orderRefundConsumer
+    stream:
+      bindings:
+        customerRegisteredConsumer-in-0:
+          destination: customer-registered
+          group: ${spring.application.name}
+        orderRefundConsumer-in-0:
+          destination: order-refund
+          group: ${spring.application.name}
+      kafka:
+        default:
+          consumer:
+            # Kafka 기반 dlq 활성화: error.<destination>.<group>
+            enableDlq: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "dev | prod"
+  cloud:
+    stream:
+      kafka:
+        binder:
+          authorization-exception-retry-interval: 1s
+          configuration:
+            security.protocol: SASL_SSL
+            sasl.mechanism: AWS_MSK_IAM
+            sasl.jaas.config: software.amazon.msk.auth.iam.IAMLoginModule required;
+            sasl.client.callback.handler.class: software.amazon.msk.auth.iam.IAMClientCallbackHandler
+
+---
+
+########################################
+# Log Level Configuration
+########################################
+
+spring:
+  config:
+    activate:
+      on-profile: "!prod"
+
+logging:
+  level:
+    web: debug
+    io.commerce.membershipService: debug
+    org.springframework.data.mongodb: debug
+    org.springframework.cloud.stream: debug
