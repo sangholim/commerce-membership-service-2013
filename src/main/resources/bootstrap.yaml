@@ -6,6 +6,7 @@ spring:
 
 aws:
   secretsmanager:
+    enabled: false
     prefix: /secret
     default-context: commerce-api
     profile-separator: /
@@ -17,7 +18,3 @@ spring:
   config:
     activate:
       on-profile: 'oas'
-
-aws:
-  secretsmanager:
-    enabled: false
