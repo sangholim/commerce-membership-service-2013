@@ -105,6 +105,7 @@ openApi {
     customBootRun {
         args.add("--spring.profiles.active=oas")
     }
+    outputDir.set(file("./openapi"))
 }
 
 tasks.withType<KotlinCompile> {
