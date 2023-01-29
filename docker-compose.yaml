@@ -1,13 +1,19 @@
 version: '3'
 
 services:
+  mongo:
+    image: bitnami/mongodb:6.0
+    ports:
+      - '27017:27017'
+    environment:
+      ALLOW_EMPTY_PASSWORD: yes
+      MONGODB_REPLICA_SET_MODE: primary
   zookeeper:
     image: bitnami/zookeeper:3
     ports:
       - "2181:2181"
     environment:
       ALLOW_ANONYMOUS_LOGIN: yes
-
   kafka:
     image: bitnami/kafka:3
     ports:
