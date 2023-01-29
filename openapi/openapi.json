@@ -1,0 +1,533 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Membership API",
+    "version": "v1.0.0-edge"
+  },
+  "servers": [
+    {
+      "url": "{host}",
+      "variables": {
+        "host": {
+          "default": "api.commerce.io",
+          "enum": [
+            "api.commerce.io",
+            "api.commerce.co.kr"
+          ]
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/internal/membership/store-credit/account/{customerId}/charge": {
+      "post": {
+        "tags": [
+          "Internal"
+        ],
+        "summary": "적립금 차감",
+        "operationId": "chargeStoreCredit",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChargeStoreCreditPayload_Internal"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionView_Internal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/membership/store-credit/account/{customerId}/refund": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "관리자 적립금 반환",
+        "description": "관리자 권한으로 적립금을 반환합니다.",
+        "operationId": "refundStoreCredit",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "description": "고객 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "적립금 반환 데이터",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    },
+    "/admin/membership/store-credit/account/{customerId}/deposit": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "관리자 적립금 지급",
+        "description": "관리자 권한으로 적립금을 지급합니다.",
+        "operationId": "depositStoreCredit",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "description": "고객 ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "적립금 지급 데이터",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    },
+    "/membership/store-credit/transactions": {
+      "get": {
+        "tags": [
+          "적립금 거래 내역"
+        ],
+        "summary": "적립금 거래 내역 조회",
+        "description": "적립금 거래 내역 조회",
+        "operationId": "getTransactions",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "거래 내역 구분",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "deposit",
+                "charge",
+                "expire"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "페이지 인덱스",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "페이지당 조회할 적립금 거래내역 개수",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionView_Public"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    },
+    "/membership/store-credit/account": {
+      "get": {
+        "tags": [
+          "적립금 계좌"
+        ],
+        "summary": "적립금 계좌 조회",
+        "operationId": "getStoreCreditAccount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreCreditAccountView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    },
+    "/membership/policies": {
+      "get": {
+        "tags": [
+          "회원 등급 정책"
+        ],
+        "summary": "회원 등급 정책 목록",
+        "description": "회원 등급 정책 목록",
+        "operationId": "getMembershipPolicies",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembershipPolicyView"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    },
+    "/membership": {
+      "get": {
+        "tags": [
+          "회원 등급"
+        ],
+        "summary": "회원 등급 조회",
+        "description": "회원 등급 조회",
+        "operationId": "getMembership",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "aegis": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChargeStoreCreditPayload_Internal": {
+        "required": [
+          "amount",
+          "orderId"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "주문 ID"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "사용할 적립금액",
+            "format": "int32"
+          }
+        },
+        "description": ""
+      },
+      "TransactionView_Internal": {
+        "required": [
+          "amount",
+          "createdAt",
+          "note",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "고유 ID"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "적립금 지급에 사용된 주문 ID"
+          },
+          "customerId": {
+            "type": "string",
+            "description": "고객 ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "거래 구분",
+            "enum": [
+              "deposit",
+              "charge",
+              "expire"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "description": "거래 금액",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string",
+            "description": "거래 요약"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "최초 생성일",
+            "format": "date-time"
+          }
+        },
+        "description": ""
+      },
+      "RefundPayload": {
+        "required": [
+          "amount",
+          "note",
+          "orderNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string",
+            "description": "주문 번호"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "적립금",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string",
+            "description": "지급 내역"
+          }
+        },
+        "description": "적립금 반환 필드 데이터"
+      },
+      "DepositPayload": {
+        "required": [
+          "amount",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "적립금",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string",
+            "description": "지급 내역"
+          }
+        },
+        "description": "적립금 지급 요청 데이터"
+      },
+      "TransactionView_Public": {
+        "required": [
+          "amount",
+          "createdAt",
+          "note",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "거래 구분",
+            "enum": [
+              "deposit",
+              "charge",
+              "expire"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "description": "거래 금액",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string",
+            "description": "거래 요약"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "최초 생성일",
+            "format": "date-time"
+          }
+        },
+        "description": ""
+      },
+      "StoreCreditAccountView": {
+        "required": [
+          "amountToExpire",
+          "balance",
+          "customerId"
+        ],
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "고객 ID"
+          },
+          "balance": {
+            "type": "integer",
+            "description": "사용 가능한 총액",
+            "format": "int32"
+          },
+          "amountToExpire": {
+            "type": "integer",
+            "description": "다음달 소멸 예정 금액",
+            "format": "int32"
+          }
+        },
+        "description": ""
+      },
+      "MembershipPolicyView": {
+        "required": [
+          "creditRewardRate",
+          "level",
+          "minimumCredit",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "description": "등급 레벨 1-4",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "등급명"
+          },
+          "minimumCredit": {
+            "type": "integer",
+            "description": "최소 누적 실적금액",
+            "format": "int32"
+          },
+          "maximumCredit": {
+            "type": "integer",
+            "description": "최대 누적 실적금액",
+            "format": "int32"
+          },
+          "creditRewardRate": {
+            "type": "number",
+            "description": "구매 확정(실적금액)시 적립율",
+            "format": "double"
+          }
+        },
+        "description": "회원 등급 정책 응답 데이터"
+      },
+      "MembershipView": {
+        "required": [
+          "creditRewardRate",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "등급 이름"
+          },
+          "creditRewardRate": {
+            "type": "number",
+            "description": "구매 확정(실적금액)시 적립율",
+            "format": "double"
+          }
+        },
+        "description": "회원 등급 요약 응답 데이터"
+      }
+    },
+    "securitySchemes": {
+      "aegis": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

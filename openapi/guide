@@ -1,0 +1,5 @@
+# GUIDE
+## Install
+- npm install -g widdershins
+## Command
+- widdershins --environment env.json openapi.json -o openapi.md
