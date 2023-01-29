@@ -3,3 +3,5 @@
 - npm install -g widdershins
 ## Command
 - widdershins --environment env.json openapi.json -o openapi.md
+## README.md 반영
+- openapi.md 내용을 붙여 넣는다
